@@ -1,4 +1,5 @@
 from tkinter import *
+from generate_maze import *
 
 my_window = Tk()
 my_window.title('Maze generator')
@@ -9,7 +10,7 @@ maze_screen.grid(row=0,column=0)
 menu_screen.grid(row=1,column=0)
 
 def draw_maze():
-    maze = generate_maze()
+    m = Maze(2)
     print("hi!")
 
 generate_button = Button(my_window, text = 'Generate maze!',command = draw_maze)

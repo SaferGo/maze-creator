@@ -1,4 +1,5 @@
 import random
+from random import shuffle
 
 
 class Position:
@@ -28,16 +29,26 @@ class Maze:
         )
 
         stack = [start_point]
+        visited = {}
+        for i in range(self.size_maze):
+            for j in range(self.size_maze):
+                visited[Position(i, j)] = False
+        visited[start_point] = True
 
         while len(stack) != 0:
             node = stack[-1]
             stack.pop()
 
-            print("We are in: ",node.x,node.y)
-
             neighbours = self.get_neighbours(node.x, node.y)
-            for x in neighbours:
-                print(x.x,x.y)
+
+            if len(neighbours) != 0:
+                shuffle(neighbours)
+                for x in neighbours:
+                    if visited[x]:
+                        continue
+                    stack.append(x)
+
+
 
     def get_neighbours(self, pos_x, pos_y):
         node = Position(pos_x, pos_y)

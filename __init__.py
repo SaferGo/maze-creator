@@ -11,7 +11,6 @@ menu_screen.grid(row=1,column=0)
 
 def draw_maze():
     m = Maze(10)
-    print("hi!")
 
 generate_button = Button(my_window, text = 'Generate maze!',command = draw_maze)
 generate_button.grid(row=1,column=0)

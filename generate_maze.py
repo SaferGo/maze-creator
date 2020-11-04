@@ -14,6 +14,7 @@ class Node:
 
 class Maze:
     mz = []
+    visited = {}
 
     def __init__(self, new_size_maze):
         self.size_maze = new_size_maze
@@ -37,6 +38,10 @@ class Maze:
                 line.append(new_node)
             self.mz.append(line)
 
+        for i in range(self.size_maze):
+            for j in range(self.size_maze):
+                self.visited[i, j] = False
+
         self.generate_maze()
 
     def generate_maze(self):
@@ -45,11 +50,8 @@ class Maze:
         start_point = self.mz[random_x][random_y]
 
         stack = [start_point]
-        visited = {}
-        for i in range(self.size_maze):
-            for j in range(self.size_maze):
-                visited[i, j] = False
-        visited[start_point.x, start_point.y] = True
+
+        self.visited[start_point.x, start_point.y] = True
 
         while len(stack) != 0:
             node = stack[-1]
@@ -59,31 +61,39 @@ class Maze:
 
             if len(neighbours) != 0:
                 shuffle(neighbours)
-                for adj_node in neighbours:
-                    if visited[adj_node.x, adj_node.y]:
-                        continue
-                    visited[adj_node.x, adj_node.y] = True
-                    stack.append(adj_node)
+                self.visited[neighbours[0]] = True
+                self.remove_wall_between(node, neighbours[0])
+                stack.append(neighbours[0])
 
     def get_neighbours(self, pos_x, pos_y):
-        node = self.mz[pos_x][pos_y]
         x = [-1, 1, 0, 0]
         y = [0, 0, -1, 1]
 
         all_neighbours = []
 
         for i in range(4):
-            if self.in_range(node.x + x[i], node.y + y[i]):
-                all_neighbours.append(
-                    self.mz[node.x + x[i]][node.y + y[i]]
-                )
+            new_x = pos_x + x[i]
+            new_y = pos_y + y[i]
+            if (self.in_range(new_x, new_y)) and \
+                    (self.visited[new_x][new_y] is False):
+                all_neighbours.append(self.mz[new_x][new_y])
         return all_neighbours
 
-    def remove_wall_between(self, other):
-        print("s")
+    def remove_wall_between(self, node1, node2):
+        if node1.x - node2.x == 1:
+            self.mz[node1.x][node1.y].top_wall = False
+            self.mz[node2.x][node2.y].bottom_wall = False
+        if node1.x - node2.y == -1:
+            self.mz[node1.x][node1.y].bottom_wall = False
+            self.mz[node2.x][node2.y].top_wall = False
+        if node1.y - node2.y == 1:
+            self.mz[node1.x][node1.y].left_wall = False
+            self.mz[node2.x][node2.y].right_wall = False
+        if node1.y - node2.y == -1:
+            self.mz[node1.x][node1.y].right_wall = False
+            self.mz[node2.x][node2.y].left_wall = False
 
     def in_range(self, x, y):
-        if (x >= 0 and y >= 0) \
-                and (x < self.size_maze and y < self.size_maze):
+        if self.size_maze > x >= 0 and self.size_maze > y >= 0:
             return True
         return False

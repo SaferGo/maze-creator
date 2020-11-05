@@ -15,6 +15,7 @@ class Node:
 class Maze:
     mz = []
     visited = {}
+    parent = {}
 
     def __init__(self, new_size_maze):
         self.size_maze = new_size_maze
@@ -41,24 +42,34 @@ class Maze:
         start_point = self.mz[random_x][random_y]
 
         stack = [start_point]
-        print("-----------")
+        #print("-----------")
         print("START POINT: ",start_point.x, start_point.y)
         self.visited[start_point.x, start_point.y] = True
+        new_connection = False
 
         while len(stack) != 0:
             node = stack[-1]
             stack.pop()
-            print("ESTOY EN: ",node.x,node.y)
-            print("####")
+
+            if new_connection:
+                self.remove_wall_between(node, self.parent[node.x, node.y])
+                new_connection = False
+
             neighbours = self.get_neighbours(node.x, node.y)
 
             if len(neighbours) != 0:
                 shuffle(neighbours)
 
-                self.visited[neighbours[0].x, neighbours[0].y] = True
-                self.remove_wall_between(node, neighbours[0])
-
-                stack.append(neighbours[0])
+                self.visited[neighbours[-1].x, neighbours[-1].y] = True
+                self.remove_wall_between(node, neighbours[-1])
+                for adj in neighbours:
+                    self.parent[adj.x, adj.y] = node
+                    stack.append(adj)
+            else:
+                #this means that one path finished
+                #so, we need to backtrack the nodes
+                #and make a new connection
+                new_connection = True
 
     def get_neighbours(self, pos_x, pos_y):
         x = [-1, 1, 0, 0]

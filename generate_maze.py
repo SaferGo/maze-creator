@@ -26,15 +26,6 @@ class Maze:
             line = []
             for y in range(new_size_maze):
                 new_node = Node(x, y)
-                if x == 0:
-                    new_node.top_wall = False
-                if y == 0:
-                    new_node.left_wall = False
-                if x == new_size_maze - 1:
-                    new_node.bottom_wall = False
-                if y == new_size_maze - 1:
-                    new_node.right_wall = False
-
                 line.append(new_node)
             self.mz.append(line)
 
@@ -50,14 +41,15 @@ class Maze:
         start_point = self.mz[random_x][random_y]
 
         stack = [start_point]
-
+        print("-----------")
+        print("START POINT: ",start_point.x, start_point.y)
         self.visited[start_point.x, start_point.y] = True
 
         while len(stack) != 0:
-            #print("Hello!")
             node = stack[-1]
             stack.pop()
-
+            print("ESTOY EN: ",node.x,node.y)
+            print("####")
             neighbours = self.get_neighbours(node.x, node.y)
 
             if len(neighbours) != 0:
@@ -86,7 +78,7 @@ class Maze:
         if node1.x - node2.x == 1:
             self.mz[node1.x][node1.y].top_wall = False
             self.mz[node2.x][node2.y].bottom_wall = False
-        if node1.x - node2.y == -1:
+        if node1.x - node2.x == -1:
             self.mz[node1.x][node1.y].bottom_wall = False
             self.mz[node2.x][node2.y].top_wall = False
         if node1.y - node2.y == 1:

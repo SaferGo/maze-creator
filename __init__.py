@@ -12,6 +12,8 @@ class Window:
         self.algorithm_button = None
         self.algorithm = None
 
+        self.app.resizable(False, False)
+
         self.app.title('Maze generator')
 
         self.create_maze_screen()
@@ -20,7 +22,7 @@ class Window:
         # draw_maze(maze_screen, def_mz_width, def_mz_height)
 
     def create_maze_screen(self):
-        self.maze_screen = Canvas(self.app, width=self.width, height=self.height, background='red')
+        self.maze_screen = Canvas(self.app, width=self.width, height=self.height, background='RoyalBlue3')
         self.maze_screen.pack(fill="both", expand=True)
 
     def create_buttons(self):
@@ -37,8 +39,10 @@ class Window:
     #    print(self.algorithm.get())
 
     def draw_maze(self):
+        self.generate_button.config(state='disabled')
         self.maze_screen.delete("all")
-        m = Maze(35, self.maze_screen, self.width, self.height, self.app)
+        m = Maze(20, self.maze_screen, self.width, self.height, self.app)
+        self.generate_button.config(state='normal')
 
 
 # maze_screen.bind("<Configure>", draw_maze)

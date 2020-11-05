@@ -29,6 +29,7 @@ class Maze:
         # remember to declare a default size for the maze
         # here we create the square
         self.size_maze = new_size_maze
+        self.draw_corner_maze()
         for x in range(new_size_maze):
             line = []
             for y in range(new_size_maze):
@@ -112,24 +113,30 @@ class Maze:
 
     def draw_cell(self, node):
         # x, y, x y
-        #print("Voy a borrar: ", node.x, node.y)
+        # print("Voy a borrar: ", node.x, node.y)
         size_step_w = int(self.width / self.size_maze)
         size_step_h = int(self.height / self.size_maze)
         if node.top_wall:
-            #print("Top!")
+            # print("Top!")
             self.maze_screen.create_line(node.y * size_step_w, node.x * size_step_h, (node.y + 1) * size_step_w,
-                                         node.x * size_step_h)
+                                         node.x * size_step_h, fill="black", width=2)
         if node.bottom_wall:
-            #print("Bottom!")
+            # print("Bottom!")
             self.maze_screen.create_line(node.y * size_step_w, (node.x + 1) * size_step_h, (node.y + 1) * size_step_w,
-                                         (node.x + 1) * size_step_h)
+                                         (node.x + 1) * size_step_h, fill="black", width=2)
         if node.right_wall:
-            #print("Right!")
+            # print("Right!")
             self.maze_screen.create_line(
                 (node.y + 1) * size_step_w, node.x * size_step_h, (node.y + 1) * size_step_w,
-                (node.x + 1) * size_step_h)
-        #if node.left_wall:
-            #print("Left!")
+                (node.x + 1) * size_step_h, fill="black", width=2)
+        # if node.left_wall:
+        # print("Left!")
+    def draw_corner_maze(self):
+        self.maze_screen.create_line(0, 0, 0, self.height, fill="black", width=2)
+        self.maze_screen.create_line(0, 0, self.width, 0, fill="black", width=2)
+        self.maze_screen.create_line(self.width, 0, self.width, self.height, fill="black", width=2)
+        self.maze_screen.create_line(0, self.height, self.width, self.height, fill="black", width=2)
+
 
     def in_range(self, x, y):
         if self.size_maze > x >= 0 and self.size_maze > y >= 0:

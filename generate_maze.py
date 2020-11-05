@@ -54,6 +54,7 @@ class Maze:
         self.visited[start_point.x, start_point.y] = True
 
         while len(stack) != 0:
+            #print("Hello!")
             node = stack[-1]
             stack.pop()
 
@@ -61,8 +62,10 @@ class Maze:
 
             if len(neighbours) != 0:
                 shuffle(neighbours)
-                self.visited[neighbours[0]] = True
+
+                self.visited[neighbours[0].x, neighbours[0].y] = True
                 self.remove_wall_between(node, neighbours[0])
+
                 stack.append(neighbours[0])
 
     def get_neighbours(self, pos_x, pos_y):
@@ -75,7 +78,7 @@ class Maze:
             new_x = pos_x + x[i]
             new_y = pos_y + y[i]
             if (self.in_range(new_x, new_y)) and \
-                    (self.visited[new_x][new_y] is False):
+                    (self.visited[new_x, new_y] is False):
                 all_neighbours.append(self.mz[new_x][new_y])
         return all_neighbours
 

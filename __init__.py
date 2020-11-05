@@ -1,48 +1,49 @@
 from tkinter import *
 from generate_maze import *
 
-my_window = Tk()
-my_window.title('Maze generator')
-maze_screen = Canvas(my_window, width=500, height=380, background='red')
-menu_screen = Canvas(my_window, width=500, height=120, background='black')
 
-maze_screen.pack(fill="both", expand=True)
-menu_screen.pack(fill="both", expand=True)
+class Window:
+    def __init__(self, master, width, height):
+        self.app = master
+        self.width = width
+        self.height = height
+        self.maze_screen = None
+        self.generate_button = None
+        self.algorithm_button = None
+        self.algorithm = None
 
-m = Maze(20)
+        self.app.title('Maze generator')
 
+        self.create_maze_screen()
 
-def create_maze():
-    print("maze!")
+        self.create_buttons()
+        # draw_maze(maze_screen, def_mz_width, def_mz_height)
 
+    def create_maze_screen(self):
+        self.maze_screen = Canvas(self.app, width=self.width, height=self.height, background='red')
+        self.maze_screen.pack(fill="both", expand=True)
 
-generate_button = Button(my_window, text='Generate maze!', command=create_maze)
-generate_button.pack(side=LEFT)
+    def create_buttons(self):
+        self.generate_button = Button(self.app, text='Generate maze!', command=self.draw_maze)
+        self.generate_button.pack(side=LEFT)
 
+        self.algorithm = StringVar(self.app)
+        self.algorithm.set("DFS")  # default
 
-def draw_maze(event):
-    maze_screen.delete("all")
-    size_step_w = int(event.width / 20)
-    size_step_h = int(event.height / 20)
-    # x, y, x y
-    for x in range(20):
-        for y in range(20):
-            print("--------------------------")
-            print("Pos: ", x, y)
-            node = m.mz[x][y]
-            if node.top_wall:
-                print("Top")
-                maze_screen.create_line(y * size_step_w, x * size_step_h, (y + 1) * size_step_w, x * size_step_h)
-            if node.bottom_wall:
-                print("Bottom")
-                maze_screen.create_line(y * size_step_w, (x + 1) * size_step_h, (y + 1) * size_step_w, (x + 1) * size_step_h)
-            if node.right_wall:
-                print("Right!")
-                maze_screen.create_line((y + 1) * size_step_w, x * size_step_h, (y + 1) * size_step_w, (x + 1) * size_step_h)
-            if node.left_wall:
-                print("Left!")
+        self.algorithm_button = OptionMenu(self.app, self.algorithm, "DFS", "M. Spanning Tree")
+        self.algorithm_button.pack(side=RIGHT)
+
+    # def get_selected_algorithm(self, _=None):
+    #    print(self.algorithm.get())
+
+    def draw_maze(self):
+        self.maze_screen.delete("all")
+        m = Maze(35, self.maze_screen, self.width, self.height, self.app)
 
 
-maze_screen.bind("<Configure>", draw_maze)
-
-my_window.mainloop()
+# maze_screen.bind("<Configure>", draw_maze)
+if __name__ == "__main__":
+    app = Tk()
+    window = Window(app, 700, 700)
+    # window.draw_maze()
+    app.mainloop()

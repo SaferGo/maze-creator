@@ -17,9 +17,15 @@ class Maze:
     visited = {}
     parent = {}
 
-    def __init__(self, new_size_maze):
+    def __init__(self, new_size_maze, maze_s, new_width, new_height, ms):
+        self.visited.clear()
+        self.parent.clear()
+        self.mz.clear()
         self.size_maze = new_size_maze
-        # remember to clear the maze later!
+        self.maze_screen = maze_s
+        self.width = new_width
+        self.height = new_height
+        self.ms = ms
         # remember to declare a default size for the maze
         # here we create the square
         self.size_maze = new_size_maze
@@ -42,34 +48,39 @@ class Maze:
         start_point = self.mz[random_x][random_y]
 
         stack = [start_point]
-        #print("-----------")
-        print("START POINT: ",start_point.x, start_point.y)
+        # print("-----------")
+        print("START POINT: ", start_point.x, start_point.y)
         self.visited[start_point.x, start_point.y] = True
         new_connection = False
 
         while len(stack) != 0:
             node = stack[-1]
             stack.pop()
+            self.visited[node.x, node.y] = True
 
             if new_connection:
                 self.remove_wall_between(node, self.parent[node.x, node.y])
+                self.maze_screen.after(2, self.draw_cell(self.parent[node.x, node.y]))
+                self.maze_screen.update()
                 new_connection = False
 
             neighbours = self.get_neighbours(node.x, node.y)
 
             if len(neighbours) != 0:
                 shuffle(neighbours)
-
-                self.visited[neighbours[-1].x, neighbours[-1].y] = True
                 self.remove_wall_between(node, neighbours[-1])
+                self.maze_screen.after(2, self.draw_cell(node))
+                self.maze_screen.update()
+
                 for adj in neighbours:
                     self.parent[adj.x, adj.y] = node
                     stack.append(adj)
             else:
-                #this means that one path finished
-                #so, we need to backtrack the nodes
-                #and make a new connection
+                # this means that one path finished
+                # so, we need to backtrack the nodes
+                # and make a new connection
                 new_connection = True
+        print("Finished!")
 
     def get_neighbours(self, pos_x, pos_y):
         x = [-1, 1, 0, 0]
@@ -98,6 +109,27 @@ class Maze:
         if node1.y - node2.y == -1:
             self.mz[node1.x][node1.y].right_wall = False
             self.mz[node2.x][node2.y].left_wall = False
+
+    def draw_cell(self, node):
+        # x, y, x y
+        #print("Voy a borrar: ", node.x, node.y)
+        size_step_w = int(self.width / self.size_maze)
+        size_step_h = int(self.height / self.size_maze)
+        if node.top_wall:
+            #print("Top!")
+            self.maze_screen.create_line(node.y * size_step_w, node.x * size_step_h, (node.y + 1) * size_step_w,
+                                         node.x * size_step_h)
+        if node.bottom_wall:
+            #print("Bottom!")
+            self.maze_screen.create_line(node.y * size_step_w, (node.x + 1) * size_step_h, (node.y + 1) * size_step_w,
+                                         (node.x + 1) * size_step_h)
+        if node.right_wall:
+            #print("Right!")
+            self.maze_screen.create_line(
+                (node.y + 1) * size_step_w, node.x * size_step_h, (node.y + 1) * size_step_w,
+                (node.x + 1) * size_step_h)
+        #if node.left_wall:
+            #print("Left!")
 
     def in_range(self, x, y):
         if self.size_maze > x >= 0 and self.size_maze > y >= 0:

@@ -44,8 +44,9 @@ class Window:
     def draw_maze(self):
         self.generate_button.config(state='disabled')
         self.maze_screen.delete("all")
-        m = Maze(35, self.maze_screen, self.width, self.app)
+        m = Maze(20, self.maze_screen, self.width)
         self.generate_button.config(state='normal')
+        m.solve_maze()
 
 
 if __name__ == "__main__":

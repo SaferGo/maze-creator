@@ -40,11 +40,11 @@ class Maze:
         self.size_maze = new_size_maze
         self.step = int(self.width / self.size_maze)
 
-        self.initialize_variables()
+        self.initialize_attributes()
         self.draw_empty_maze()
         self.generate_maze()
 
-    def initialize_variables(self):
+    def initialize_attributes(self):
         for x in range(self.size_maze):
             line = []
             for y in range(self.size_maze):
@@ -62,8 +62,7 @@ class Maze:
         self.parent[start_point.x, start_point.y] = start_point
 
         while len(stack) != 0:
-            node = stack[-1]
-            stack.pop()
+            node = stack.pop()
             self.visited[node.x, node.y] = True
 
             self.maze_screen.after(
@@ -73,7 +72,7 @@ class Maze:
             )
             self.maze_screen.update()
 
-            neighbours = self.get_neighbours(node.x, node.y)
+            neighbours = self.get_neighbours(node.x, node.y, False)
 
             if len(neighbours) != 0:
                 shuffle(neighbours)
@@ -84,7 +83,7 @@ class Maze:
 
         self.draw_start_and_end_point()
 
-    def get_neighbours(self, pos_x, pos_y):
+    def get_neighbours(self, pos_x, pos_y, solve_maze):
         x = [-1, 1, 0, 0]
         y = [0, 0, -1, 1]
 
@@ -95,26 +94,13 @@ class Maze:
             new_y = pos_y + y[i]
             if (self.in_range(new_x, new_y)) and \
                     (self.visited[new_x, new_y] is False):
-                all_neighbours.append(self.mz[new_x][new_y])
-        return all_neighbours
-
-    # this method is the same as get_neighbours,
-    # the only difference is that here we also
-    # consider the walls. I use this functions
-    # just in solve_maze().
-    def get_neighbours_solver(self, pos_x, pos_y):
-        x = [-1, 1, 0, 0]
-        y = [0, 0, -1, 1]
-
-        all_neighbours = []
-
-        for i in range(4):
-            new_x = pos_x + x[i]
-            new_y = pos_y + y[i]
-            if (self.in_range(new_x, new_y)) and \
-                    (self.visited[new_x, new_y] is False) and \
-                    (is_wall(self.mz[pos_x][pos_y], x[i], y[i]) is False):
-                all_neighbours.append(self.mz[new_x][new_y])
+                # if we are trying to solve the maze
+                # we'll also consider the walls
+                if solve_maze:
+                    if not is_wall(self.mz[pos_x][pos_y], x[i], y[i]):
+                        all_neighbours.append(self.mz[new_x][new_y])
+                else:
+                    all_neighbours.append(self.mz[new_x][new_y])
         return all_neighbours
 
     def remove_walls_between(self, node1, node2):
@@ -195,27 +181,31 @@ class Maze:
 
         start_point = self.mz[0][0]
 
-        self.dfs_solver(start_point)
+        self.print_path_dfs(start_point)
 
     def delete_canvas(self, obj_id):
         self.maze_screen.delete(obj_id)
         self.maze_screen.update()
 
-    def dfs_solver(self, node):
+    def print_path_dfs(self, node):
         self.visited[node.x, node.y] = True
 
         if self.visited[self.size_maze - 1, self.size_maze - 1]:
             return
 
-        circle_id = self.draw_circle(node)
-        self.maze_screen.update()
-        time.sleep(0.08)
+        # We don't want to draw the start node
+        if node.x == 0 and node.y == 0:
+            circle_id = None
+        else:
+            circle_id = self.draw_circle(node)
+            self.maze_screen.update()
+            time.sleep(0.08)
 
-        neighbours = self.get_neighbours_solver(node.x, node.y)
+        neighbours = self.get_neighbours(node.x, node.y, True)
 
         if len(neighbours) != 0:
             for adj in neighbours:
-                self.dfs_solver(adj)
+                self.print_path_dfs(adj)
 
         # this avoids to delete the final path
         if not self.visited[self.size_maze - 1, self.size_maze - 1]:

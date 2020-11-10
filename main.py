@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Canvas, Button, StringVar, LEFT, RIGHT, OptionMenu, Tk
 from generate_maze import *
 
 

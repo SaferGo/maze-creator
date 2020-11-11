@@ -91,8 +91,9 @@ class Maze:
         on_container[start_point.x, start_point.y] = True
 
         while len(container) != 0:
-            shuffle(container)
-            node = container.pop()
+            random_index = random.randint(0, len(container) - 1)
+            node = container[random_index]
+            del container[random_index]
 
             self.visited[node.x, node.y] = True
 
@@ -101,10 +102,13 @@ class Maze:
             )
 
             if len(visited_neighbours) != 0:
-                shuffle(visited_neighbours)
+                random_index = random.randint(
+                    0, len(visited_neighbours) - 1
+                )
                 self.maze_screen.after(
-                    1, self.remove_walls_between(
-                        node, visited_neighbours[0]
+                    3, self.remove_walls_between(
+                        node,
+                        visited_neighbours[random_index]
                     )
                 )
                 self.maze_screen.update()
@@ -257,7 +261,7 @@ class Maze:
         else:
             circle_id = self.draw_circle(node)
             self.maze_screen.update()
-            time.sleep(0.08)
+            time.sleep(0.036)
 
         neighbours = self.get_neighbours(node, False, True)
 
@@ -269,5 +273,5 @@ class Maze:
         if not self.visited[self.size_maze - 1, self.size_maze - 1]:
             self.maze_screen.itemconfig(circle_id, fill='red')
             self.maze_screen.update()
-            time.sleep(0.15)
+            time.sleep(0.066)
             self.delete_canvas(circle_id)

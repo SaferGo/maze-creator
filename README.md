@@ -1,6 +1,6 @@
 # Maze generator and solver
 ---
-Basic maze generator and solver created in python using tkinter.
+Basic maze generator and solver created in python3 using tkinter.
 ### Maze-generator algorithms:
   - Depth-first search
   - Minimum spanning tree (Prim's Maze Generator)

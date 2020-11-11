@@ -27,11 +27,9 @@ def is_wall(node, x, y):
 class Maze:
     mz = []
     visited = {}
-    parent = {}
 
     def __init__(self, new_size_maze, maze_s, new_width):
         self.visited.clear()
-        self.parent.clear()
         self.mz.clear()
 
         self.size_maze = new_size_maze
@@ -42,7 +40,7 @@ class Maze:
 
         self.initialize_attributes()
         self.draw_empty_maze()
-        self.generate_maze()
+        self.generate_maze('mst')
 
     def initialize_attributes(self):
         for x in range(self.size_maze):
@@ -52,55 +50,115 @@ class Maze:
                 line.append(Node(x, y))
             self.mz.append(line)
 
-    def generate_maze(self):
-        random_x = random.randint(0, self.size_maze - 1)
-        random_y = random.randint(0, self.size_maze - 1)
-        start_point = self.mz[random_x][random_y]
-
+    def dfs(self, start_point):
         stack = [start_point]
-        self.visited[start_point.x, start_point.y] = True
-        self.parent[start_point.x, start_point.y] = start_point
 
+        parent = {(start_point.x, start_point.y): start_point}
         while len(stack) != 0:
             node = stack.pop()
+
             self.visited[node.x, node.y] = True
 
             self.maze_screen.after(
                 3, self.remove_walls_between(
-                    node, self.parent[node.x, node.y]
+                    node, parent[node.x, node.y]
                 )
             )
             self.maze_screen.update()
 
-            neighbours = self.get_neighbours(node.x, node.y, False)
+            neighbours = self.get_neighbours(
+                node, False, False
+            )
 
             if len(neighbours) != 0:
                 shuffle(neighbours)
 
                 for adj in neighbours:
-                    self.parent[adj.x, adj.y] = node
+                    parent[adj.x, adj.y] = node
                     stack.append(adj)
+
+    def mst(self, start_point):
+        container = [start_point]
+
+        # Such that we have 3 states in Prim's
+        # algorithm(neighbour, visited and unvisited)
+        # we have to avoid adding repeated nodes on the
+        # container.
+        on_container = {}
+        for x in range(self.size_maze):
+            for y in range(self.size_maze):
+                on_container[x, y] = False
+        on_container[start_point.x, start_point.y] = True
+
+        while len(container) != 0:
+            shuffle(container)
+            node = container.pop()
+
+            self.visited[node.x, node.y] = True
+
+            visited_neighbours = self.get_neighbours(
+                node, True, False
+            )
+
+            if len(visited_neighbours) != 0:
+                shuffle(visited_neighbours)
+                self.maze_screen.after(
+                    1, self.remove_walls_between(
+                        node, visited_neighbours[0]
+                    )
+                )
+                self.maze_screen.update()
+
+            unvisited_neighbours = self.get_neighbours(
+                node, False, False
+            )
+            for adj in unvisited_neighbours:
+                if not on_container[adj.x, adj.y]:
+                    container.append(adj)
+                    on_container[adj.x, adj.y] = True
+
+    def generate_maze(self, algorithm):
+        random_x = random.randint(0, self.size_maze - 1)
+        random_y = random.randint(0, self.size_maze - 1)
+        start_point = self.mz[random_x][random_y]
+
+        self.visited[start_point.x, start_point.y] = True
+
+        if algorithm == 'dfs':
+            self.dfs(start_point)
+        else:
+            self.mst(start_point)
 
         self.draw_start_and_end_point()
 
-    def get_neighbours(self, pos_x, pos_y, solve_maze):
+    def get_neighbours(self, node, get_visited, solve_maze):
+        # Here we specify if we want to get the visited
+        # neighbours(for the mst algorithm) or the unvisited(dfs).
+        # Also, we will use this function to solve the maze, so
+        # in that case we will consider the walls
         x = [-1, 1, 0, 0]
         y = [0, 0, -1, 1]
 
         all_neighbours = []
 
         for i in range(4):
-            new_x = pos_x + x[i]
-            new_y = pos_y + y[i]
-            if (self.in_range(new_x, new_y)) and \
-                    (self.visited[new_x, new_y] is False):
-                # if we are trying to solve the maze
-                # we'll also consider the walls
-                if solve_maze:
-                    if not is_wall(self.mz[pos_x][pos_y], x[i], y[i]):
-                        all_neighbours.append(self.mz[new_x][new_y])
-                else:
+            new_x = node.x + x[i]
+            new_y = node.y + y[i]
+
+            if get_visited:
+                if (self.in_range(new_x, new_y)) and \
+                        (self.visited[new_x, new_y]):
                     all_neighbours.append(self.mz[new_x][new_y])
+            else:
+                if (self.in_range(new_x, new_y)) and \
+                        (self.visited[new_x, new_y] is False):
+                    # if we are trying to solve the maze
+                    # we'll also consider the walls
+                    if solve_maze:
+                        if not is_wall(self.mz[node.x][node.y], x[i], y[i]):
+                            all_neighbours.append(self.mz[new_x][new_y])
+                    else:
+                        all_neighbours.append(self.mz[new_x][new_y])
         return all_neighbours
 
     def remove_walls_between(self, node1, node2):
@@ -201,7 +259,7 @@ class Maze:
             self.maze_screen.update()
             time.sleep(0.08)
 
-        neighbours = self.get_neighbours(node.x, node.y, True)
+        neighbours = self.get_neighbours(node, False, True)
 
         if len(neighbours) != 0:
             for adj in neighbours:

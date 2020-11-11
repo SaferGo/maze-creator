@@ -35,16 +35,19 @@ class Window:
         self.algorithm.set("DFS")  # default
 
         self.algorithm_button = OptionMenu(
-            self.app, self.algorithm, "DFS", "M. Spanning Tree")
+            self.app, self.algorithm, "DFS", "MST")
         self.algorithm_button.pack(side=RIGHT)
 
-    # def get_selected_algorithm(self, _=None):
-    #    print(self.algorithm.get())
+    def get_selected_algorithm(self, _=None):
+        return self.algorithm.get()
 
     def draw_maze(self):
         self.generate_button.config(state='disabled')
         self.maze_screen.delete("all")
-        m = Maze(20, self.maze_screen, self.width)
+        m = Maze(
+            20, self.maze_screen, self.width,
+            self.get_selected_algorithm()
+        )
         self.generate_button.config(state='normal')
         m.solve_maze()
 

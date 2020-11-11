@@ -3,7 +3,7 @@
 Basic maze generator and solver created in python using tkinter.
 ### Maze-generator algorithms:
   - Depth-first search
-  - Minimum spanning tree
+  - Minimum spanning tree (Prim's Maze Generator)
 
 ### Maze-solver algorithm:
   - Depth-first search

@@ -28,7 +28,7 @@ class Maze:
     mz = []
     visited = {}
 
-    def __init__(self, new_size_maze, maze_s, new_width):
+    def __init__(self, new_size_maze, maze_s, new_width, algorithm):
         self.visited.clear()
         self.mz.clear()
 
@@ -38,11 +38,11 @@ class Maze:
         self.size_maze = new_size_maze
         self.step = int(self.width / self.size_maze)
 
-        self.initialize_attributes()
+        self.initialize_maze()
         self.draw_empty_maze()
-        self.generate_maze('mst')
+        self.generate_maze(algorithm)
 
-    def initialize_attributes(self):
+    def initialize_maze(self):
         for x in range(self.size_maze):
             line = []
             for y in range(self.size_maze):
@@ -124,7 +124,7 @@ class Maze:
 
         self.visited[start_point.x, start_point.y] = True
 
-        if algorithm == 'dfs':
+        if algorithm == 'DFS':
             self.dfs(start_point)
         else:
             self.mst(start_point)

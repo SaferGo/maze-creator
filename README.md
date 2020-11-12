@@ -13,7 +13,7 @@ Basic maze generator and solver created in python3 using tkinter.
 - [Tkinter](https://docs.python.org/3/library/tkinter.html) v8.6
 - Python3 v3.8.5
 
-#### Building for source
+#### Building from source
 ```sh
 $ python3 main.py
 ```
